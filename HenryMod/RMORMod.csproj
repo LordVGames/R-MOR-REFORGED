@@ -142,6 +142,9 @@
     <Reference Include="SimpleJSON">
       <HintPath>libs\SimpleJSON.dll</HintPath>
     </Reference>
+    <Reference Include="Survariants">
+      <HintPath>libs\SoftDependencies\Survariants.dll</HintPath>
+    </Reference>
     <Reference Include="TILER2">
       <HintPath>libs\SoftDependencies\TILER2.dll</HintPath>
     </Reference>

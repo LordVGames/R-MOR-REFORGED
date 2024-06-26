@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Security.Permissions;
+using UnityEngine;
+using Survariants;
 
 [module: UnverifiableCode]
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -14,6 +16,8 @@ using System.Security.Permissions;
 //rename this namespace
 namespace RMORMod
 {
+    [BepInDependency("pseudopulse.Survariants", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.EnforcerGang.HANDOverclocked", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.weliveinasociety.CustomEmotesAPI", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.DestroyedClone.AncientScepter", BepInDependency.DependencyFlags.SoftDependency)]
@@ -42,6 +46,8 @@ namespace RMORMod
         public static RMORPlugin instance;
         public static PluginInfo pluginInfo;
 
+        public static bool HANDLoaded = false;
+        public static bool SurvariantsLoaded = false;
         public static bool ScepterStandaloneLoaded = false;
         public static bool ScepterClassicLoaded = false;
         public static bool EmoteAPILoaded = false;
@@ -80,7 +86,16 @@ namespace RMORMod
             {
                 Stage.onStageStartGlobal += SetArena;
             }
+
             RoR2.RoR2Application.onLoad += AddMechanicalBodies;
+        }
+
+        private void Start()
+        {
+            if (Modules.Config.addAsVariant && RMORPlugin.HANDLoaded && RMORPlugin.SurvariantsLoaded)
+            {
+                RoR2.RoR2Application.onLoad += AddRmorAsHandVariant;
+            }
         }
 
         private void AddMechanicalBodies()
@@ -94,6 +109,8 @@ namespace RMORMod
 
         private void CheckDependencies()
         {
+            SurvariantsLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("pseudopulse.Survariants");
+            HANDLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.EnforcerGang.HANDOverclocked");
             ScepterStandaloneLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.DestroyedClone.AncientScepter");
             ScepterClassicLoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.ClassicItems");
             EmoteAPILoaded = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.weliveinasociety.CustomEmotesAPI");
@@ -124,6 +141,27 @@ namespace RMORMod
                     }
                 }
             };
+        }
+
+        private void AddRmorAsHandVariant()
+        {
+            SurvivorDef HANDSurvivorDef = SurvivorCatalog.GetSurvivorDef(SurvivorCatalog.GetSurvivorIndexFromBodyIndex(BodyCatalog.FindBodyIndex("HANDOverclockedBody")));
+            SurvivorDef RMORSurvivorDef = SurvivorCatalog.GetSurvivorDef(SurvivorCatalog.GetSurvivorIndexFromBodyIndex(BodyCatalog.FindBodyIndex("RMORBody")));
+            if (!HANDSurvivorDef || !RMORSurvivorDef)
+            {
+                return;
+            }
+
+            SurvivorVariantDef RMORVariant = ScriptableObject.CreateInstance<SurvivorVariantDef>();
+            (RMORVariant as ScriptableObject).name = RMORSurvivorDef.cachedName;
+            RMORVariant.name = RMORSurvivorDef.displayNameToken;
+            RMORVariant.VariantSurvivor = RMORSurvivorDef;
+            RMORVariant.TargetSurvivor = HANDSurvivorDef;
+            RMORVariant.RequiredUnlock = UnlockableCatalog.GetUnlockableDef("MoriyaRMORSurvivorUnlock");
+            RMORVariant.Description = RMORPlugin.DEVELOPER_PREFIX + "_RMOR_BODY_SUBTITLE";
+
+            RMORSurvivorDef.hidden = true;
+            SurvivorVariantCatalog.AddSurvivorVariant(RMORVariant);
         }
     }
 }

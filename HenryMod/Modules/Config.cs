@@ -7,6 +7,7 @@ namespace RMORMod.Modules
 {
     public static class Config
     {
+        public static bool addAsVariant = false;
         public static bool forceUnlock = false;
         public static bool allowPlayerRepair = false;
         public static bool skillIssue = false;
@@ -20,6 +21,7 @@ namespace RMORMod.Modules
         {
             sortPosition = RMORPlugin.instance.Config.Bind("General", "Survivor Sort Position", 4.51f, "Controls where R-MOR is placed in the character select screen.").Value;
             forceUnlock = RMORPlugin.instance.Config.Bind("General", "Force Unlock", false, "Automatically unlock R-MOR and his skills by default.").Value;
+            addAsVariant = RMORPlugin.instance.Config.Bind("General", "Add as HAN-D Variant", true, "If the HAN-D and Survariants mods are installed, R-MOR will be added as a variant for HAN-D.").Value;
 
             skillIssue = RMORPlugin.instance.Config.Bind("Tweaks", "Drone Cooldown", false, "Adds a 20 second cooldown for R-MOR's drones alongside building stocks on kill.").Value;
             //originalLayout = RMORPlugin.instance.Config.Bind("Tweaks", "Original Layout", true, "Swaps Special and Secondary to match RoRR's layout of HAN-D's skills.z").Value;
